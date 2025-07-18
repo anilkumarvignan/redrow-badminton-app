@@ -26,9 +26,10 @@ const saveShuttle = async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ sheet: "Shuttle", row }),
     });
+
     setMessage("Shuttle expense saved successfully!");
     
-    // Reset form fields
+    // Reset form fields here
     setAmount("");
     setPaidBy("");
     setPlayers([]);
@@ -37,6 +38,7 @@ const saveShuttle = async () => {
     setMessage("Error saving shuttle expense. Please try again.");
   }
 };
+
 
   
   const togglePlayer = (player) => {
