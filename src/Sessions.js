@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxL6ZHyhm6TP3hH1mWHXELiqCPZa85eHjx7ecmmsAH8m-YAI9RrQ3RTBHfb9AlHTMcT/exec";
 
 const players = [
   "Anil", "Viswa", "Venkat", "Ravi", "Yeswant", "Satya Vinay",
@@ -15,9 +15,7 @@ export default function Sessions() {
 
   const togglePlayer = (name) => {
     setSelectedPlayers(prev =>
-      prev.includes(name)
-        ? prev.filter(p => p !== name)
-        : [...prev, name]
+      prev.includes(name) ? prev.filter(p => p !== name) : [...prev, name]
     );
   };
 
