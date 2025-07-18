@@ -2,101 +2,100 @@ import React, { useEffect, useState } from "react";
 
 const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbySgXPakDr7rNc0ojUK6vSWubSj-lByZrXV88yqLpCEDWyUI9I1FUwZArMXhi8ivDH3/exec";
 
+
 function History() {
   const [sessionsData, setSessionsData] = useState([]);
-  const [shuttlesData, setShuttlesData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [shuttleData, setShuttleData] = useState([]);
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Fetch Sessions data
-        const sessionsRes = await fetch(`${GOOGLE_SHEET_URL}?sheet=Sessions`);
-        const sessionsJson = await sessionsRes.json();
-        const sessionsRows = sessionsJson.data || [];
-
-        // Fetch Shuttles data
-        const shuttlesRes = await fetch(`${GOOGLE_SHEET_URL}?sheet=Shuttles`);
-        const shuttlesJson = await shuttlesRes.json();
-        const shuttlesRows = shuttlesJson.data || [];
-
-        // Get last 5 records or fewer, but keep header row intact
-        const lastSessions = sessionsRows.length > 1 ? [sessionsRows[0]].concat(sessionsRows.slice(-5)) : sessionsRows;
-        const lastShuttles = shuttlesRows.length > 1 ? [shuttlesRows[0]].concat(shuttlesRows.slice(-5)) : shuttlesRows;
-
-        setSessionsData(lastSessions);
-        setShuttlesData(lastShuttles);
-      } catch (err) {
-        setError("Failed to fetch data.");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchData();
+    fetchData("Sessions", setSessionsData);
+    fetchData("Shuttles", setShuttleData);
   }, []);
 
-  const renderTable = (title, rows) => {
-    if (rows.length < 2) return <p>{title}: No records found.</p>;
+  const fetchData = async (sheet, setData) => {
+    try {
+      const res = await fetch(`${GOOGLE_SCRIPT_URL}?sheet=${sheet}`);
+      const json = await res.json();
+      if (json.data && json.data.length > 1) {
+        // Remove header row and take last 5 rows
+        const rowsWithoutHeader = json.data.slice(1);
+        const lastFive = rowsWithoutHeader.slice(-5);
+        setData(lastFive);
+      } else {
+        setData([]);
+      }
+    } catch (error) {
+      console.error(`Error fetching ${sheet}:`, error);
+      setData([]);
+    }
+  };
 
-    const isSessions = title.toLowerCase().includes("session");
-
+  const renderTable = (rows, headers, isSessions = false) => {
     return (
-      <div style={{ marginBottom: "40px" }}>
-        <h3>{title}</h3>
-        <table className="history-table" style={{ borderCollapse: "collapse", width: "100%" }}>
-          <thead>
+      <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 20 }}>
+        <thead>
+          <tr>
+            {headers.map((head, i) => (
+              <th
+                key={i}
+                style={{
+                  borderBottom: "2px solid #333",
+                  padding: "8px",
+                  textAlign: "left",
+                  backgroundColor: "#f0f0f0",
+                }}
+              >
+                {head}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.length > 0 ? (
+            rows.map((row, i) => (
+              <tr key={i} style={{ borderBottom: "1px solid #ddd" }}>
+                {row.map((cell, j) => {
+                  if (isSessions && j === 0) {
+                    // Format date for Sessions date column
+                    const date = new Date(cell);
+                    const options = { day: "2-digit", month: "short", year: "numeric" };
+                    return (
+                      <td key={j} style={{ padding: "8px" }}>
+                        {isNaN(date) ? cell : date.toLocaleDateString("en-GB", options)}
+                      </td>
+                    );
+                  }
+                  return (
+                    <td key={j} style={{ padding: "8px" }}>
+                      {cell}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))
+          ) : (
             <tr>
-              {rows[0].map((head, i) => (
-                <th
-                  key={i}
-                  style={{
-                    border: "1px solid #ddd",
-                    padding: "8px",
-                    backgroundColor: "#f2f2f2",
-                    textAlign: "left",
-                  }}
-                >
-                  {head}
-                </th>
-              ))}
+              <td colSpan={headers.length} style={{ padding: "8px", fontStyle: "italic" }}>
+                No records found.
+              </td>
             </tr>
-          </thead>
-          <tbody>
-{rows.length > 1 ? rows.slice(1).map((row, i) => (
-    <tr key={i} style={{ borderBottom: "1px solid #ddd" }}>
-      {row.map((cell, j) => {
-        if (isSessions && j === 0) {
-          // Format date for Sessions date column
-          const date = new Date(cell);
-          const options = { day: "2-digit", month: "short", year: "numeric" };
-          return <td key={j} style={{ padding: "8px" }}>{isNaN(date) ? cell : date.toLocaleDateString("en-GB", options)}</td>;
-        }
-        return (
-          <td key={j} style={{ padding: "8px" }}>
-            {cell}
-          </td>
-        );
-      })}
-    </tr>
-  )) : <tr><td colSpan={rows[0].length} style={{ padding: "8px" }}>No records found.</td></tr>}
-          </tbody>
-        </table>
-      </div>
+          )}
+        </tbody>
+      </table>
     );
   };
 
-  if (loading) return <p>Loading history...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
-
   return (
     <div>
-      {renderTable("Sessions History (Last 5 Records)", sessionsData)}
-      {renderTable("Shuttles History (Last 5 Records)", shuttlesData)}
+      <h2>Latest Sessions</h2>
+      {renderTable(
+        sessionsData,
+        ["Date", "Courts", "Booking Fee", "Paid By", "Players"],
+        true
+      )}
+
+      <h2>Latest Shuttles</h2>
+      {renderTable(shuttleData, ["Date", "Amount", "Paid By", "Players"])}
     </div>
   );
 }
