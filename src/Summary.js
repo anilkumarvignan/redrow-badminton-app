@@ -1,51 +1,81 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfv6jm5uJHkszx5seo8jK1z_QPIv7IRU0bbkVWQSjSyQvJcGOS7tIIr4JDe-g4xm_6/exec';
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxL6ZHyhm6TP3hH1mWHXELiqCPZa85eHjx7ecmmsAH8m-YAI9RrQ3RTBHfb9AlHTMcT/exec";
+
+const players = [
+  "Anil", "Viswa", "Venkat", "Ravi", "Yeswant", "Satya Vinay",
+  "Suresh", "Sailesh", "Chandra", "Abhishek", "Naveen", "Akshay"
+];
 
 export default function Summary() {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [summary, setSummary] = useState([]);
 
   useEffect(() => {
-    fetch(GOOGLE_SCRIPT_URL + '?action=read')
-      .then(res => res.json())
-      .then(json => {
-        setData(json.data || []);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
-  }, []);
+    const loadData = async () => {
+      const sessionRes = await fetch(`${GOOGLE_SCRIPT_URL}?sheet=Sessions`);
+      const shuttleRes = await fetch(`${GOOGLE_SCRIPT_URL}?sheet=Shuttles`);
+      const sessionData = (await sessionRes.json()).data || [];
+      const shuttleData = (await shuttleRes.json()).data || [];
 
-  if (loading) return <p>Loading summary...</p>;
+      const stats = {};
+      players.forEach(p => stats[p] = { paid: 0, share: 0 });
+
+      // Sessions
+      for (let i = 1; i < sessionData.length; i++) {
+        const [,, fee, paidBy, playersStr] = sessionData[i];
+        const attendees = playersStr.split(",").map(p => p.trim()).filter(Boolean);
+        const split = fee / attendees.length;
+        attendees.forEach(p => stats[p].share += split);
+        stats[paidBy].paid += Number(fee);
+      }
+
+      // Shuttles
+      for (let i = 1; i < shuttleData.length; i++) {
+        const [, amount, paidBy, sharedStr] = shuttleData[i];
+        const shared = sharedStr.split(",").map(p => p.trim()).filter(Boolean);
+        const split = amount / shared.length;
+        shared.forEach(p => stats[p].share += split);
+        stats[paidBy].paid += Number(amount);
+      }
+
+      const results = players.map(name => ({
+        name,
+        paid: stats[name].paid.toFixed(2),
+        share: stats[name].share.toFixed(2),
+        balance: (stats[name].paid - stats[name].share).toFixed(2)
+      }));
+
+      setSummary(results);
+    };
+
+    loadData();
+  }, []);
 
   return (
     <div>
-      <h2>Summary</h2>
-      {data.length === 0 ? (
-        <p>No data found.</p>
-      ) : (
-        <table border="1" cellPadding="5" style={{ borderCollapse: 'collapse', width: '100%' }}>
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Date</th>
-              <th>Details</th>
+      <h2 className="text-xl font-bold mb-2">Summary</h2>
+      <table className="w-full border text-sm">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="border px-2 py-1">Player</th>
+            <th className="border px-2 py-1">Paid (£)</th>
+            <th className="border px-2 py-1">Share (£)</th>
+            <th className="border px-2 py-1">Balance (£)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {summary.map((s) => (
+            <tr key={s.name}>
+              <td className="border px-2 py-1">{s.name}</td>
+              <td className="border px-2 py-1">{s.paid}</td>
+              <td className="border px-2 py-1">{s.share}</td>
+              <td className={`border px-2 py-1 ${s.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {s.balance}
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {data.map((row, i) => (
-              <tr key={i}>
-                <td>{row[0]}</td>
-                <td>{row[1]}</td>
-                <td>{row.slice(2).join(', ')}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
