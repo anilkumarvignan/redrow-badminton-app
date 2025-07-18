@@ -1,74 +1,72 @@
 import React, { useState } from "react";
 
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzB-ClAkOBgM3BpTVo4xMstn6Bat3kmZ-pUhcUmzX0tHXV7VQ99iH1L47Ds9tRCuuYE/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOviN26bY7wDKmcs4zvSsWxd_4V-ubHgmAxLEyad6X6BKKhKIpNiE65jZ4iPKLfh91/exec";
 
-const players = [
-  "Anil", "Viswa", "Venkat", "Ravi", "Yeswant", "Satya Vinay",
-  "Suresh", "Sailesh", "Chandra", "Abhishek", "Naveen", "Akshay"
-];
-
-export default function Sessions() {
-  const [selectedDate, setSelectedDate] = useState("");
+function Sessions() {
+  const [date, setDate] = useState("");
   const [courts, setCourts] = useState(1);
   const [paidBy, setPaidBy] = useState("");
-  const [selectedPlayers, setSelectedPlayers] = useState([]);
+  const [players, setPlayers] = useState([]);
+  const [message, setMessage] = useState("");
 
-  const togglePlayer = (name) => {
-    setSelectedPlayers(prev =>
-      prev.includes(name) ? prev.filter(p => p !== name) : [...prev, name]
-    );
-  };
+  const playersList = ["Anil", "Viswa", "Venkat", "Ravi", "Yeswant", "Satya Vinay", "Suresh", "Sailesh", "Chandra", "Abhishek", "Naveen", "Akshay"];
 
   const saveSession = async () => {
+    if (!date || !paidBy || players.length === 0) {
+      setMessage("Please fill all required fields.");
+      return;
+    }
+
     const bookingFee = courts === 1 ? 10 : 20;
-    const formattedDate = new Date(selectedDate).toLocaleDateString("en-GB", {
-      day: "2-digit", month: "short", year: "2-digit"
-    });
+    const row = [date, courts, bookingFee, paidBy, players.join(", ")];
 
-    const row = [
-      formattedDate,
-      courts,
-      bookingFee,
-      paidBy,
-      selectedPlayers.join(", ")
-    ];
+    try {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",    // important to avoid CORS errors
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ sheet: "Sessions", row }),
+      });
+      setMessage("Session saved! Please refresh to see updates.");
+    } catch (err) {
+      console.error(err);
+      setMessage("Error saving session.");
+    }
+  };
 
-    await fetch(GOOGLE_SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sheet: "Sessions", row })
-    });
-
-    alert("Session saved!");
-    setSelectedDate(""); setPaidBy(""); setSelectedPlayers([]);
+  const togglePlayer = (player) => {
+    setPlayers(prev => prev.includes(player) ? prev.filter(p => p !== player) : [...prev, player]);
   };
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-2">Session Entry</h2>
-      <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} className="border p-1" />
-      <select value={courts} onChange={e => setCourts(Number(e.target.value))} className="ml-2 border p-1">
-        <option value={1}>1 Court (£10)</option>
-        <option value={2}>2 Courts (£20)</option>
-      </select>
+      <h2>Sessions</h2>
+      <label>Date: <input type="date" value={date} onChange={e => setDate(e.target.value)} /></label><br />
+      <label>No. of Courts:
+        <select value={courts} onChange={e => setCourts(Number(e.target.value))}>
+          <option value={1}>1</option>
+          <option value={2}>2</option>
+        </select>
+      </label><br />
+      <label>Paid By:
+        <select value={paidBy} onChange={e => setPaidBy(e.target.value)}>
+          <option value="">Select</option>
+          {playersList.map(p => <option key={p} value={p}>{p}</option>)}
+        </select>
+      </label><br />
+      <label>Players:</label><br />
+      {playersList.map(p => (
+        <label key={p} style={{ marginRight: 10 }}>
+          <input type="checkbox" checked={players.includes(p)} onChange={() => togglePlayer(p)} /> {p}
+        </label>
+      ))}
       <br /><br />
-      <label className="font-semibold">Paid by:</label>
-      <select value={paidBy} onChange={e => setPaidBy(e.target.value)} className="border ml-2 p-1">
-        <option value="">Select</option>
-        {players.map(p => <option key={p}>{p}</option>)}
-      </select>
-      <br /><br />
-      <label className="font-semibold">Players Attended:</label>
-      <div className="grid grid-cols-2 gap-1 mt-1">
-        {players.map(p => (
-          <label key={p}>
-            <input type="checkbox" checked={selectedPlayers.includes(p)} onChange={() => togglePlayer(p)} /> {p}
-          </label>
-        ))}
-      </div>
-      <button onClick={saveSession} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded">
-        Save Session
-      </button>
+      <button onClick={saveSession}>Save</button>
+      <p>{message}</p>
     </div>
   );
 }
+
+export default Sessions;
