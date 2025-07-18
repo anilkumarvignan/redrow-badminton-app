@@ -11,30 +11,34 @@ function Sessions() {
 
   const playersList = ["Anil", "Viswa", "Venkat", "Ravi", "Yeswant", "Satya Vinay", "Suresh", "Sailesh", "Chandra", "Abhishek", "Naveen", "Akshay"];
 
-  const saveSession = async () => {
-    if (!date || !paidBy || players.length === 0) {
-      setMessage("Please fill all required fields.");
-      return;
-    }
+const saveSession = async () => {
+  if (!date || !paidBy || players.length === 0) {
+    setMessage("Please fill all required fields.");
+    return;
+  }
 
-    const bookingFee = courts === 1 ? 10 : 20;
-    const row = [date, courts, bookingFee, paidBy, players.join(", ")];
+  const bookingFee = courts === 1 ? 10 : 20;
+  const row = [date, courts, bookingFee, paidBy, players.join(", ")];
 
-    try {
-      await fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",    // important to avoid CORS errors
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ sheet: "Sessions", row }),
-      });
-      setMessage("Session saved! Please refresh to see updates.");
-    } catch (err) {
-      console.error(err);
-      setMessage("Error saving session.");
-    }
-  };
+  try {
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sheet: "Sessions", row }),
+    });
+    setMessage("Session saved successfully!");
+    
+    // Reset form fields
+    setDate("");
+    setCourts(1);
+    setPaidBy("");
+    setPlayers([]);
+  } catch (err) {
+    console.error(err);
+    setMessage("Error saving session. Please try again.");
+  }
+};
 
   const togglePlayer = (player) => {
     setPlayers(prev => prev.includes(player) ? prev.filter(p => p !== player) : [...prev, player]);
