@@ -1,81 +1,76 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfv6jm5uJHkszx5seo8jK1z_QPIv7IRU0bbkVWQSjSyQvJcGOS7tIIr4JDe-g4xm_6/exec';
-const players = ['Anil', 'Viswa', 'Venkat', 'Ravi', 'Yeswant', 'Satya Vinay', 'Suresh', 'Sailesh', 'Chandra', 'Abhishek', 'Naveen', 'Akshay'];
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
+
+const players = [
+  "Anil", "Viswa", "Venkat", "Ravi", "Yeswant", "Satya Vinay",
+  "Suresh", "Sailesh", "Chandra", "Abhishek", "Naveen", "Akshay"
+];
 
 export default function Sessions() {
-  const [date, setDate] = useState('');
-  const [numCourts, setNumCourts] = useState(1);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [courts, setCourts] = useState(1);
+  const [paidBy, setPaidBy] = useState("");
   const [selectedPlayers, setSelectedPlayers] = useState([]);
-  const [paidBy, setPaidBy] = useState('');
 
-  const togglePlayer = (player) => {
+  const togglePlayer = (name) => {
     setSelectedPlayers(prev =>
-      prev.includes(player) ? prev.filter(p => p !== player) : [...prev, player]
+      prev.includes(name)
+        ? prev.filter(p => p !== name)
+        : [...prev, name]
     );
   };
 
-  const handleSave = async () => {
-    if (!date || !paidBy || selectedPlayers.length === 0) {
-      alert('Please select date, paid by, and at least one player.');
-      return;
-    }
-
-    const formattedDate = new Date(date).toLocaleDateString('en-GB', {
-      weekday: 'short', day: '2-digit', month: 'short', year: '2-digit'
+  const saveSession = async () => {
+    const bookingFee = courts === 1 ? 10 : 20;
+    const formattedDate = new Date(selectedDate).toLocaleDateString("en-GB", {
+      day: "2-digit", month: "short", year: "2-digit"
     });
 
-    const payload = {
-      row: ['SESSION', formattedDate, numCourts, paidBy, ...players.map(p => selectedPlayers.includes(p) ? 'Yes' : '')]
-    };
+    const row = [
+      formattedDate,
+      courts,
+      bookingFee,
+      paidBy,
+      selectedPlayers.join(", ")
+    ];
 
-    try {
-      const res = await fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (res.ok) {
-        alert('Session saved successfully!');
-        // Reset form
-        setDate('');
-        setNumCourts(1);
-        setSelectedPlayers([]);
-        setPaidBy('');
-      } else {
-        alert('Failed to save session.');
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Error saving session.');
-    }
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sheet: "Sessions", row })
+    });
+
+    alert("Session saved!");
+    setSelectedDate(""); setPaidBy(""); setSelectedPlayers([]);
   };
 
   return (
     <div>
-      <h2>Session Entry</h2>
-      <label>Date: <input type="date" value={date} onChange={e => setDate(e.target.value)} /></label>
-      <label>No. of Courts:
-        <select value={numCourts} onChange={e => setNumCourts(Number(e.target.value))}>
-          <option value={1}>1 (£10)</option>
-          <option value={2}>2 (£20)</option>
-        </select>
-      </label>
-      <label>Paid By:
-        <select value={paidBy} onChange={e => setPaidBy(e.target.value)}>
-          <option value="">Select</option>
-          {players.map(p => <option key={p}>{p}</option>)}
-        </select>
-      </label>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', marginTop: '1rem' }}>
+      <h2 className="text-xl font-bold mb-2">Session Entry</h2>
+      <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} className="border p-1" />
+      <select value={courts} onChange={e => setCourts(Number(e.target.value))} className="ml-2 border p-1">
+        <option value={1}>1 Court (£10)</option>
+        <option value={2}>2 Courts (£20)</option>
+      </select>
+      <br /><br />
+      <label className="font-semibold">Paid by:</label>
+      <select value={paidBy} onChange={e => setPaidBy(e.target.value)} className="border ml-2 p-1">
+        <option value="">Select</option>
+        {players.map(p => <option key={p}>{p}</option>)}
+      </select>
+      <br /><br />
+      <label className="font-semibold">Players Attended:</label>
+      <div className="grid grid-cols-2 gap-1 mt-1">
         {players.map(p => (
           <label key={p}>
-            <input type="checkbox" checked={selectedPlayers.includes(p)} onChange={() => togglePlayer(p)} />
-            {p}
+            <input type="checkbox" checked={selectedPlayers.includes(p)} onChange={() => togglePlayer(p)} /> {p}
           </label>
         ))}
       </div>
-      <button onClick={handleSave} style={{ marginTop: '1rem' }}>Save Session</button>
+      <button onClick={saveSession} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded">
+        Save Session
+      </button>
     </div>
   );
 }
