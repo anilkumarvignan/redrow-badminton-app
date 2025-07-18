@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxL6ZHyhm6TP3hH1mWHXELiqCPZa85eHjx7ecmmsAH8m-YAI9RrQ3RTBHfb9AlHTMcT/exec";
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbySgXPakDr7rNc0ojUK6vSWubSj-lByZrXV88yqLpCEDWyUI9I1FUwZArMXhi8ivDH3/exec";
 
 function History() {
   const [sessionHistory, setSessionHistory] = useState([]);
