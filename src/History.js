@@ -67,23 +67,23 @@ function History() {
             </tr>
           </thead>
           <tbody>
-            {rows.slice(1).map((row, i) => (
-              <tr key={i} style={{ borderBottom: "1px solid #ddd" }}>
-                {row.map((cell, j) => {
-                  if (isSessions && j === 0) {
-                    // Format date for Sessions date column
-                    const date = new Date(cell);
-                    const options = { day: "2-digit", month: "short", year: "numeric" };
-                    return <td key={j} style={{ padding: "8px" }}>{isNaN(date) ? cell : date.toLocaleDateString("en-GB", options)}</td>;
-                  }
-                  return (
-                    <td key={j} style={{ padding: "8px" }}>
-                      {cell}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
+{rows.length > 1 ? rows.slice(1).map((row, i) => (
+    <tr key={i} style={{ borderBottom: "1px solid #ddd" }}>
+      {row.map((cell, j) => {
+        if (isSessions && j === 0) {
+          // Format date for Sessions date column
+          const date = new Date(cell);
+          const options = { day: "2-digit", month: "short", year: "numeric" };
+          return <td key={j} style={{ padding: "8px" }}>{isNaN(date) ? cell : date.toLocaleDateString("en-GB", options)}</td>;
+        }
+        return (
+          <td key={j} style={{ padding: "8px" }}>
+            {cell}
+          </td>
+        );
+      })}
+    </tr>
+  )) : <tr><td colSpan={rows[0].length} style={{ padding: "8px" }}>No records found.</td></tr>}
           </tbody>
         </table>
       </div>
