@@ -11,30 +11,34 @@ function Shuttles() {
 
   const playersList = ["Anil", "Viswa", "Venkat", "Ravi", "Yeswant", "Satya Vinay", "Suresh", "Sailesh", "Chandra", "Abhishek", "Naveen", "Akshay"];
 
-  const saveShuttle = async () => {
-    if (!date || !paidBy || players.length === 0 || !amount) {
-      setMessage("Please fill all required fields.");
-      return;
-    }
+const saveShuttle = async () => {
+  if (!paidBy || players.length === 0 || !amount) {
+    setMessage("Please fill all required fields.");
+    return;
+  }
 
-    const row = [date, paidBy, players.join(", "), amount];
+  const row = [new Date().toLocaleDateString("en-GB"), amount, paidBy, players.join(", ")];
 
-    try {
-      await fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ sheet: "Shuttles", row }),
-      });
-      setMessage("Shuttle expense saved! Please refresh to see updates.");
-    } catch (err) {
-      console.error(err);
-      setMessage("Error saving shuttle expense.");
-    }
-  };
+  try {
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sheet: "Shuttle", row }),
+    });
+    setMessage("Shuttle expense saved successfully!");
+    
+    // Reset form fields
+    setAmount("");
+    setPaidBy("");
+    setPlayers([]);
+  } catch (err) {
+    console.error(err);
+    setMessage("Error saving shuttle expense. Please try again.");
+  }
+};
 
+  
   const togglePlayer = (player) => {
     setPlayers(prev => prev.includes(player) ? prev.filter(p => p !== player) : [...prev, player]);
   };
