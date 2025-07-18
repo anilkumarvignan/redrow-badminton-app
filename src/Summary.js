@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOviN26bY7wDKmcs4zvSsWxd_4V-ubHgmAxLEyad6X6BKKhKIpNiE65jZ4iPKLfh91/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypD7YuBRGkewUcH2OB473WDF2-GeHc-7ijPqhhcL0ynkG2mFmH7IoQuwm3UerfOAua/exec";
 
 const players = [
   "Anil", "Viswa", "Venkat", "Ravi", "Yeswant", "Satya Vinay",
