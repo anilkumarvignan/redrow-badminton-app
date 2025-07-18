@@ -50,8 +50,8 @@ const saveSession = async () => {
       <label>Date: <input type="date" value={date} onChange={e => setDate(e.target.value)} /></label><br />
       <label>No. of Courts:
         <select value={courts} onChange={e => setCourts(Number(e.target.value))}>
-          <option value={1}>1</option>
-          <option value={2}>2</option>
+          <option value={1}>1(£10) </option>
+          <option value={2}>2(£20)</option>
         </select>
       </label><br />
       <label>Paid By:
