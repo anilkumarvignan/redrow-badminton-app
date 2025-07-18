@@ -24,7 +24,7 @@ const saveShuttle = async () => {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sheet: "Shuttle", row }),
+      body: JSON.stringify({ sheet: "Shuttles", row }),
     });
 
     setMessage("Shuttle expense saved successfully!");
