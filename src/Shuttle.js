@@ -1,69 +1,67 @@
 import React, { useState } from "react";
 
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzB-ClAkOBgM3BpTVo4xMstn6Bat3kmZ-pUhcUmzX0tHXV7VQ99iH1L47Ds9tRCuuYE/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOviN26bY7wDKmcs4zvSsWxd_4V-ubHgmAxLEyad6X6BKKhKIpNiE65jZ4iPKLfh91/exec";
 
-const players = [
-  "Anil", "Viswa", "Venkat", "Ravi", "Yeswant", "Satya Vinay",
-  "Suresh", "Sailesh", "Chandra", "Abhishek", "Naveen", "Akshay"
-];
-
-export default function Shuttles() {
+function Shuttles() {
   const [date, setDate] = useState("");
-  const [amount, setAmount] = useState("");
   const [paidBy, setPaidBy] = useState("");
-  const [sharedWith, setSharedWith] = useState([]);
+  const [players, setPlayers] = useState([]);
+  const [amount, setAmount] = useState("");
+  const [message, setMessage] = useState("");
 
-  const togglePlayer = (name) => {
-    setSharedWith(prev =>
-      prev.includes(name) ? prev.filter(p => p !== name) : [...prev, name]
-    );
-  };
+  const playersList = ["Anil", "Viswa", "Venkat", "Ravi", "Yeswant", "Satya Vinay", "Suresh", "Sailesh", "Chandra", "Abhishek", "Naveen", "Akshay"];
 
   const saveShuttle = async () => {
-    const formattedDate = new Date(date).toLocaleDateString("en-GB", {
-      day: "2-digit", month: "short", year: "2-digit"
-    });
+    if (!date || !paidBy || players.length === 0 || !amount) {
+      setMessage("Please fill all required fields.");
+      return;
+    }
 
-    const row = [
-      formattedDate,
-      amount,
-      paidBy,
-      sharedWith.join(", ")
-    ];
+    const row = [date, paidBy, players.join(", "), amount];
 
-    await fetch(GOOGLE_SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sheet: "Shuttles", row })
-    });
+    try {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ sheet: "Shuttles", row }),
+      });
+      setMessage("Shuttle expense saved! Please refresh to see updates.");
+    } catch (err) {
+      console.error(err);
+      setMessage("Error saving shuttle expense.");
+    }
+  };
 
-    alert("Shuttle expense saved!");
-    setDate(""); setAmount(""); setPaidBy(""); setSharedWith([]);
+  const togglePlayer = (player) => {
+    setPlayers(prev => prev.includes(player) ? prev.filter(p => p !== player) : [...prev, player]);
   };
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-2">Shuttle Entry</h2>
-      <input type="date" value={date} onChange={e => setDate(e.target.value)} className="border p-1" />
-      <input type="number" value={amount} onChange={e => setAmount(e.target.value)} className="ml-2 border p-1" placeholder="Amount" />
+      <h2>Shuttle Expenses</h2>
+      <label>Date: <input type="date" value={date} onChange={e => setDate(e.target.value)} /></label><br />
+      <label>Paid By:
+        <select value={paidBy} onChange={e => setPaidBy(e.target.value)}>
+          <option value="">Select</option>
+          {playersList.map(p => <option key={p} value={p}>{p}</option>)}
+        </select>
+      </label><br />
+      <label>Players to split:</label><br />
+      {playersList.map(p => (
+        <label key={p} style={{ marginRight: 10 }}>
+          <input type="checkbox" checked={players.includes(p)} onChange={() => togglePlayer(p)} /> {p}
+        </label>
+      ))}
+      <br />
+      <label>Amount (£): <input type="number" value={amount} onChange={e => setAmount(e.target.value)} /></label>
       <br /><br />
-      <label className="font-semibold">Paid by:</label>
-      <select value={paidBy} onChange={e => setPaidBy(e.target.value)} className="border ml-2 p-1">
-        <option value="">Select</option>
-        {players.map(p => <option key={p}>{p}</option>)}
-      </select>
-      <br /><br />
-      <label className="font-semibold">Shared with:</label>
-      <div className="grid grid-cols-2 gap-1 mt-1">
-        {players.map(p => (
-          <label key={p}>
-            <input type="checkbox" checked={sharedWith.includes(p)} onChange={() => togglePlayer(p)} /> {p}
-          </label>
-        ))}
-      </div>
-      <button onClick={saveShuttle} className="mt-4 bg-green-600 text-white px-4 py-2 rounded">
-        Save Shuttle
-      </button>
+      <button onClick={saveShuttle}>Save</button>
+      <p>{message}</p>
     </div>
   );
 }
+
+export default Shuttles;
