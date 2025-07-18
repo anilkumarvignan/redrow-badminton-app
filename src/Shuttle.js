@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypD7YuBRGkewUcH2OB473WDF2-GeHc-7ijPqhhcL0ynkG2mFmH7IoQuwm3UerfOAua/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbySgXPakDr7rNc0ojUK6vSWubSj-lByZrXV88yqLpCEDWyUI9I1FUwZArMXhi8ivDH3/exec";
 
 function Shuttles() {
   const [date, setDate] = useState("");
