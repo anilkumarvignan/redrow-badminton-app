@@ -67,3 +67,20 @@ button {
 button:hover {
   background-color: #0056b3;
 }
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table th,
+.history-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.history-table th {
+  background-color: #f9f9f9;
+  font-weight: bold;
+}
