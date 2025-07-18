@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzSTp-r864MoM5LgJLFedRR5kwVWVdg5rI2AMw4UhEjL_5hdclCqH7LlZx5l9uR-qQL/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfv6jm5uJHkszx5seo8jK1z_QPIv7IRU0bbkVWQSjSyQvJcGOS7tIIr4JDe-g4xm_6/exec';
 
 export default function Summary() {
   const [data, setData] = useState([]);
