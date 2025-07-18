@@ -30,6 +30,7 @@ const saveShuttle = async () => {
     setMessage("Shuttle expense saved successfully!");
     
     // Reset form fields here
+     setDate("");
     setAmount("");
     setPaidBy("");
     setPlayers([]);
