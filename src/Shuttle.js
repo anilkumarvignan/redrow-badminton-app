@@ -9,7 +9,7 @@ function Shuttles() {
   const [amount, setAmount] = useState("");
   const [message, setMessage] = useState("");
 
-  const playersList = ["Anil", "Viswa", "Venkat", "Ravi", "Yaswanth", "Satya Vinay", "Suresh", "Sailesh", "Chandra", "Abhishek", "Naveen", "Akshay", "Satya"];
+  const playersList = ["Anil", "Viswa", "Venkat", "Ravi", "Yaswanth", "Satya Vinay", "Suresh", "Sailesh", "Chandra", "Abhishek", "Naveen", "Akshay", "Satya","Puneeth","Uchit","Mazar","Rajesh"];
 
 const saveShuttle = async () => {
   if (!paidBy || players.length === 0 || !amount) {
