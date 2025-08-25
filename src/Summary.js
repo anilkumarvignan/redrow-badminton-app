@@ -10,7 +10,7 @@ function Summary() {
       .then((res) => res.json())
       .then((data) => {
         if (data.data && data.data.length > 0) {
-          // Remove header from data if needed
+          // Remove header row
           const [, ...rows] = data.data;
           setSummaryData(rows);
         }
@@ -27,6 +27,7 @@ function Summary() {
         <thead>
           <tr>
             <th>Player</th>
+            <th>Sessions Attended</th>
             <th>Sessions Paid (£)</th>
             <th>Shuttle Paid (£)</th>
             <th>Total Paid (£)</th>
