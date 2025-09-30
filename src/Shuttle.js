@@ -3,7 +3,7 @@ import React, { useState } from "react";
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbySgXPakDr7rNc0ojUK6vSWubSj-lByZrXV88yqLpCEDWyUI9I1FUwZArMXhi8ivDH3/exec";
 
 const playersList = [
-  "Anil","Viswa","Venkat","Ravi","Yaswanth","Abyson","Satya Vinay",
+  "Anil","Viswa","Venkat","Ravi","Yaswanth","Abyson","Vishal", "Satya Vinay",
   "Manoj","Rohit","Suresh","Sailesh","Chandra","Abhishek","Naveen",
   "Akshay","Satya","Puneeth","Uchit","Mazar","Rajesh","Satish","Praveen"
 ];
