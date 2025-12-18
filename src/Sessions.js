@@ -9,7 +9,7 @@ function Sessions() {
   const [players, setPlayers] = useState([]);
   const [message, setMessage] = useState("");
 
-  const playersList = ["Anil", "Viswa", "Venkat", "Ravi", "Yaswanth", "Abyson", "Vishal", "Satya Vinay", "Manoj", "Rohit", "Suresh", "Sailesh", "Chandra", "Abhishek", "Naveen", "Akshay","Satya", "Puneeth","Uchit","Mazar","Rajesh","Satish", "Praveen"];
+  const playersList = ["Anil", "Viswa", "Venkat", "Ravi", "Yaswanth", "Abyson", "Vishal", "Satya Vinay", "Manoj", "Rohit", "Suresh", "Sailesh", "Chandra", "Abhishek", "Naveen", "Akshay","Satya", "Puneeth","Uchit","Mazar","Rajesh","Satish", "Debasis"];
 
 const saveSession = async () => {
   if (!date || !paidBy || players.length === 0) {
