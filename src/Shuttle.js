@@ -5,7 +5,7 @@ const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbySgXPakDr7rN
 const playersList = [
   "Anil","Viswa","Venkat","Ravi","Yaswanth","Abyson","Vishal", "Satya Vinay",
   "Manoj","Rohit","Suresh","Sailesh","Chandra","Abhishek","Naveen",
-  "Akshay","Satya","Puneeth","Uchit","Mazar","Rajesh","Satish","Praveen"
+  "Akshay","Satya","Puneeth","Uchit","Mazar","Rajesh","Satish","Debasis"
 ];
 
 function Shuttles() {
